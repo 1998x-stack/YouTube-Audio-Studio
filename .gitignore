@@ -1,0 +1,14 @@
+__pycache__/
+.pytest_cache/
+*.pyc
+.env
+.venv/
+data/
+work/
+.ipynb_checkpoints/
+*.uploading
+
+# Editable install artifacts / build outputs
+*.egg-info/
+build/
+dist/

@@ -1,0 +1,14 @@
+services:
+  studio:
+    build: .
+    ports:
+      - "127.0.0.1:7860:7860"
+    volumes:
+      - ./data:/data
+      - ./work:/scratch
+    environment:
+      STUDIO_ROOT: /data
+      STUDIO_SCRATCH: /scratch
+      STUDIO_HOST: 0.0.0.0
+      STUDIO_SHARE: "false"
+    restart: unless-stopped
