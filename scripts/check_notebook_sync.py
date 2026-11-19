@@ -24,6 +24,7 @@ with ZipFile(io.BytesIO(base64.b64decode(match.group(1)))) as archive:
         f.relative_to(ROOT).as_posix() for f in ROOT.rglob("*")
         if f.is_file() and f.name != "YouTube_Audio_Studio_Colab.ipynb"
         and not any(x in f.parts for x in (".git", "__pycache__", ".pytest_cache", ".venv"))
+        and not any(part.endswith(".egg-info") for part in f.parts)
         and f.suffix != ".pyc"
     }
     if names != expected:

@@ -7,3 +7,8 @@ data/
 work/
 .ipynb_checkpoints/
 *.uploading
+
+# Editable install artifacts / build outputs
+*.egg-info/
+build/
+dist/
