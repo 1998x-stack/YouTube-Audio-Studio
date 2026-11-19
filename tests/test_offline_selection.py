@@ -48,3 +48,14 @@ def test_domain_result_is_backwards_compatible():
     from studio.domain.models import VideoResult as Canonical
     from studio.engine import VideoResult as Legacy
     assert Canonical is Legacy
+
+
+def test_colab_public_console_requires_login():
+    # Static guard: publishing this console without auth exposes user-supplied API keys.
+    from pathlib import Path
+    import json
+    notebook = json.loads((Path(__file__).resolve().parents[1] / "YouTube_Audio_Studio_Colab.ipynb").read_text("utf-8"))
+    public_cell = "".join(notebook["cells"][-1]["source"])
+    assert "share=True" in public_cell
+    assert "auth=(AUTH_USER, AUTH_PASSWORD)" in public_cell
+    assert "secrets.token_urlsafe(" in public_cell
