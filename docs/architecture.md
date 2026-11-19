@@ -53,3 +53,10 @@ flowchart TD
 - 完全离线的频道扫描无法精确得知频道的所有视频；`仅处理已有`模式仅取 ROOT 中已知、可匹配频道的音频。
 - 分块 JSON 的时间戳是相对视频的绝对毫秒；如果 API 只返回一个文字段落，时间戳仅到音频块级别。
 - 字幕和自动文章不是独立事实核验。不同 LLM 端点可能有上下文长度和速率限制，按分段减少一次性输入。
+
+## Code category migration (Phase 1)
+
+- `studio/domain/links.py`: canonical URL parser; `studio/links.py` remains a compatibility shim.
+- `studio/domain/models.py`: `VideoResult` contract, re-exported from `studio.engine` for existing clients.
+- `studio/application/offline_selection.py`: strict offline cache selection; cached playlists and unverified custom channel URLs fail closed instead of pulling unrelated videos.
+- The external API wrappers, storage adapter and UI will be relocated in later PRs after contract tests are complete.

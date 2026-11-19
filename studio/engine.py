@@ -6,12 +6,13 @@ import threading
 import traceback
 import zipfile
 from concurrent.futures import ThreadPoolExecutor, wait, FIRST_COMPLETED
-from dataclasses import asdict, dataclass
+from dataclasses import asdict
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable
 
 from .articles import create_article
+from .domain.models import VideoResult
 from .asr import Whisper, transcribe
 from .config import RunOptions
 from .links import Link, parse_link
@@ -20,18 +21,6 @@ from .youtube import discover, ensure_audio
 from .utils import short_hash, redact_error
 
 
-@dataclass
-class VideoResult:
-    video_id: str
-    title: str = ""
-    status: str = "pending"
-    audio: str = ""
-    transcript: str = ""
-    article: str = ""
-    error: str = ""
-
-    def table_row(self) -> list[str]:
-        return [self.video_id, self.title[:55], self.status, self.audio, self.transcript, self.article, self.error[:240]]
 
 
 class Engine:

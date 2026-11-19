@@ -126,3 +126,11 @@ pytest -q
 ```
 
 测试全程使用模拟媒体、断点重启及 mock Whisper，不会向 YouTube 发起请求；真实 GPU 推理、网络下载和第三方 API 仍需在目标运行环境做一次端到端验收。
+
+## 分层代码分类（Phase 1）
+
+为了避免一次性重写所有实现并破坏旧数据库，本仓库采用渐进迁移：纯 URL 解析位于 `studio/domain/links.py`，UI/CLI 结果模型位于 `studio/domain/models.py`，离线数据选择策略位于 `studio/application/offline_selection.py`。原有 `studio.links` 与 `studio.engine.VideoResult` 仍兼容。其他适配器在后续 PR 按 ports 契约逐步迁移。完整计划见 `docs/roadmap.md`。
+
+**离线范围安全**：无法证明播放列表成员关系时，`--local-only` + 播放列表会明确报错，不再把 ROOT 中所有音频误认为该播放列表成员；对 `@handle` 与 `/channel/ID` 使用精确元数据匹配，对无法核验的自定义频道地址拒绝范围推断。可以使用单个视频 URL 离线恢复。
+
+**Notebook 同步检查**：每次修改项目源码后，必须同步更新内嵌源码的 `YouTube_Audio_Studio_Colab.ipynb`，并执行 `python scripts/check_notebook_sync.py`，避免在 Colab 中重新解压旧版本覆盖代码。

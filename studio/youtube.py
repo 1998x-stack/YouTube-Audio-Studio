@@ -3,6 +3,7 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 from .links import Link, VIDEO_RE
+from .application.offline_selection import select_cached_videos
 from .store import Store
 from .utils import ffprobe_seconds, publish, publish_text, sha_file
 
@@ -22,22 +23,7 @@ def discover(store: Store, link: Link, limit: str, only_existing: bool = False,
         store.checkpoint()
         return [link.video_id]
     if only_existing:
-        # Filter locally cached audio by uploader handle where possible.
-        from urllib.parse import urlparse
-        handle = urlparse(link.url).path.split("/")[1].lower().lstrip("@") if "/@" in link.url else ""
-        with store.lock:
-            rows = store.conn.execute("SELECT video_id,metadata_json FROM videos ORDER BY discovered_at DESC").fetchall()
-        matches = []
-        for vid, raw in rows:
-            if not (store.root / "media" / f"{vid}.mp3").exists():
-                continue
-            meta = json.loads(raw or "{}")
-            if handle and handle not in str(meta.get("uploader_id", "")).lower().lstrip("@"):
-                continue
-            matches.append(vid)
-        if limit != "全部":
-            matches = matches[:int(limit)]
-        return matches
+        return select_cached_videos(store, link, limit)
     from yt_dlp import YoutubeDL
     opts = {"extract_flat": "in_playlist", "skip_download": True,
             "ignoreerrors": True, "quiet": True, "no_warnings": False,
